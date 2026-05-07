@@ -34,7 +34,7 @@
         </div>
 
         <div class="st-footnote" id="st-footnote" style="display:none">
-            mkt cap = est. (close × hardcoded shares outstanding) &nbsp;·&nbsp; chg = vs prev trading day close &nbsp;·&nbsp; click any row to add notes
+            mkt cap = est. (close × hardcoded shares outstanding) &nbsp;·&nbsp; 24hr chg = prev close → current close &nbsp;·&nbsp; click any row to add notes
         </div>
 
     </div>
@@ -226,7 +226,7 @@ function renderTable() {
     tr.appendChild(makeHeader('Ticker', null, ''));
     tr.appendChild(makeHeader('Name', null, ''));
     tr.appendChild(makeHeader('Close', null, 'r'));
-    tr.appendChild(makeHeader('Chg', 'change_pct', 'r'));
+    tr.appendChild(makeHeader('24hr Chg', 'change_pct', 'r'));
     tr.appendChild(makeHeader('Mkt Cap', 'market_cap', 'r'));
     tr.appendChild(makeHeader('', null, ''));
     thead.appendChild(tr);
