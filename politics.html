@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>politics - inky</title>
+    <link rel="stylesheet" href="style.css?v=2"/>
+    <link rel="icon" type="image/x-icon" href="images/cat4.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        .pol-hero {
+            padding: 44px 0 36px;
+            border-bottom: 1px solid #252525;
+            margin-bottom: 34px;
+        }
+
+        .pol-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 2.9rem;
+            font-weight: 700;
+            color: #f0f0e8;
+            line-height: 1.08;
+            letter-spacing: -0.015em;
+            margin: 0 0 18px;
+        }
+
+        .pol-lede {
+            font-style: italic;
+            font-size: 0.88rem;
+            color: #6a6a62;
+            line-height: 1.72;
+            max-width: 560px;
+            padding-left: 16px;
+            border-left: 2px solid #2c2c2c;
+            margin: 0;
+        }
+
+        .pol-identity {
+            background: #1c1c1c;
+            border: 1px solid #262626;
+            border-left: 3px solid #3e5248;
+            padding: 22px 26px;
+            margin-bottom: 36px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .pol-identity.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .pol-id-label {
+            font-family: 'Courier New', monospace;
+            font-size: 0.55rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: #444;
+            margin-bottom: 7px;
+        }
+
+        .pol-id-tag {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 1.05rem;
+            color: #d0d0c8;
+            margin-bottom: 14px;
+            line-height: 1.4;
+        }
+
+        .pol-id-body {
+            font-size: 0.78rem;
+            color: #7a7a72;
+            line-height: 1.72;
+            margin-bottom: 16px;
+        }
+
+        .pol-id-comps {
+            font-family: 'Courier New', monospace;
+            font-size: 0.6rem;
+            color: #424240;
+            line-height: 1.9;
+        }
+
+        .pol-id-comps em {
+            font-style: normal;
+            color: #6a8090;
+        }
+
+        .pol-issues-heading {
+            font-family: 'Courier New', monospace;
+            font-size: 0.57rem;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: #404040;
+            border-bottom: 1px solid #222;
+            padding-bottom: 8px;
+            margin-bottom: 0;
+        }
+
+        .pol-issue {
+            padding: 22px 0;
+            border-bottom: 1px solid #1e1e1e;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.45s ease, transform 0.45s ease;
+        }
+
+        .pol-issue.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .pol-issue:last-of-type {
+            border-bottom: none;
+            padding-bottom: 32px;
+        }
+
+        .pol-issue-name {
+            font-family: 'Courier New', monospace;
+            font-size: 0.58rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: #5a7880;
+            margin-bottom: 9px;
+        }
+
+        .pol-issue-body {
+            font-size: 0.83rem;
+            color: #a0a098;
+            line-height: 1.76;
+            margin-bottom: 10px;
+        }
+
+        .pol-issue-why {
+            font-family: 'Courier New', monospace;
+            font-size: 0.58rem;
+            color: #383836;
+            letter-spacing: 0.04em;
+        }
+
+        .pol-issue-why::before {
+            content: '↳ ';
+            color: #303030;
+        }
+
+        @media (max-width: 700px) {
+            .pol-title { font-size: 2.1rem; }
+        }
+    </style>
+</head>
+<script src="script.js"></script>
+<body>
+<div id="page">
+
+    <div id="header">
+        <div id="header-banner"></div>
+        <div id="header-text">
+            <div id="site-title"><a href="index.html">inky</a></div>
+            <div id="site-tagline">somewhere on the internet</div>
+        </div>
+    </div>
+
+    <div id="columns">
+    <div id="main">
+
+        <div class="pol-hero">
+            <h1 class="pol-title">Where I Stand</h1>
+            <p class="pol-lede">I don't fit neatly into either party. These are my actual positions — evidence-driven, pragmatic, and subject to change when I learn something new.</p>
+        </div>
+
+        <div class="pol-identity">
+            <div class="pol-id-label">political identity</div>
+            <div class="pol-id-tag">Pragmatic Centrist / Technocratic Utilitarian</div>
+            <div class="pol-id-body">I prioritize competence over ideology. I trust institutions that work and distrust ones that don't. I form positions from evidence, not team loyalty. I sit to the right on criminal justice and immigration levels, to the left on healthcare and climate, and libertarian on speech and guns. Neither party fits.</div>
+            <div class="pol-id-comps">
+                international equivalents → <em>Emmanuel Macron (France)</em>, <em>Dutch-style liberal democracy</em><br>
+                philosophical tradition → <em>John Stuart Mill</em> — harm principle, evidence-based governance
+            </div>
+        </div>
+
+        <div class="pol-issues-heading">issues &amp; positions</div>
+
+        <div class="pol-issue">
+            <div class="pol-issue-name">Government</div>
+            <div class="pol-issue-body">I want a large, competent, expert-led government. Congress should be filled with domain experts and retired faculty, not career politicians. Size matters less than effectiveness.</div>
+            <div class="pol-issue-why">competence over ideology</div>
+        </div>
+
+        <div class="pol-issue">
+            <div class="pol-issue-name">Healthcare</div>
+            <div class="pol-issue-body">Healthcare is a public good, not a private service. The market has failed at it. I lean toward government-run or heavily regulated universal coverage.</div>
+            <div class="pol-issue-why">market failure demands public intervention</div>
+        </div>
+
+        <div class="pol-issue">
+            <div class="pol-issue-name">Economy</div>
+            <div class="pol-issue-body">The real issue is affordability and purchasing power, not inequality per se. I'm open to UBI, especially as AI reshapes labor markets. Safety nets should be protected and expanded preemptively.</div>
+            <div class="pol-issue-why">AI disruption is structural — get ahead of it</div>
+        </div>
+
+        <div class="pol-issue">
+            <div class="pol-issue-name">Immigration</div>
+            <div class="pol-issue-body">Immigration is good and economically valuable. Current levels are too high and the system is too family-based. I'd shift to a skills-based model like Canada or Australia, and support a path to citizenship for undocumented people already here.</div>
+            <div class="pol-issue-why">skills over family chains at scale</div>
+        </div>
+
+        <div class="pol-issue">
+            <div class="pol-issue-name">Criminal Justice</div>
+            <div class="pol-issue-body">Repeat, high-recidivism offenders should face longer sentences. Soft prosecutorial discretion in cities like LA has been a mistake. Rehabilitation works in specific cases and should be identified and pursued — but not assumed.</div>
+            <div class="pol-issue-why">recidivism data should drive sentencing, not ideology</div>
+        </div>
+
+        <div class="pol-issue">
+            <div class="pol-issue-name">Policing</div>
+            <div class="pol-issue-body">Qualified immunity is overextended. Officers should face real legal consequences for misconduct. Police brutality creates a distrust feedback loop that makes everyone less safe. Systemic bias is real but operates within genuinely high-risk environments.</div>
+            <div class="pol-issue-why">distrust feedback loops cost lives on both sides</div>
+        </div>
+
+        <div class="pol-issue">
+            <div class="pol-issue-name">Guns</div>
+            <div class="pol-issue-body">Legal gun owners aren't the problem. The Second Amendment's original tyranny-prevention justification is practically obsolete against modern military force. I'd support stricter checks and red flag laws. Safety beats abstract rights here.</div>
+            <div class="pol-issue-why">empirical safety over theoretical rights</div>
+        </div>
+
+        <div class="pol-issue">
+            <div class="pol-issue-name">Drugs</div>
+            <div class="pol-issue-body">Policy should be driven by societal harm, not morality. Hard opioids like heroin and fentanyl should remain illegal. Marijuana and psychedelics are in a gray zone — potentially prescribable and regulated rather than criminalized outright.</div>
+            <div class="pol-issue-why">harm reduction, not moral enforcement</div>
+        </div>
+
+    </div>
+
+    <div id="sidebar">
+        <div class="widget">
+            <div class="widget-title">nav</div>
+            <div class="widget-body">
+                <a href="blog.html">blog</a><br>
+                <a href="projects.html">projects</a><br>
+                <a href="experiences.html">experiences</a><br>
+                <a href="menu.html">menu</a><br>
+                <a href="politics.html">politics</a>
+            </div>
+        </div>
+        <div class="widget">
+            <div class="widget-title">currently</div>
+            <div class="widget-body">
+                mood: <span class="val">tired</span><br>
+                avoiding: <span class="val">work</span><br>
+                watching: <span class="val" id="sidebar-watching">—</span>
+            </div>
+        </div>
+        <div class="widget">
+            <div class="widget-title">site</div>
+            <div class="widget-body">
+                est. <span class="val">2024</span><br>
+                updated: <span class="val">may '26</span>
+            </div>
+        </div>
+        <div class="widget">
+            <div class="widget-title">elsewhere</div>
+            <div class="widget-body">
+                <a href="https://github.com/Inkiad" target="_blank">github</a>
+            </div>
+        </div>
+    </div>
+    </div>
+
+</div>
+<div id="cat"></div>
+<div id="cat-bubble"></div>
+
+<script>
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                const delay = parseInt(entry.target.dataset.delay) || 0;
+                setTimeout(() => entry.target.classList.add('visible'), delay);
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.08 });
+
+    document.querySelectorAll('.pol-identity, .pol-issue').forEach((el, i) => {
+        el.dataset.delay = i * 55;
+        observer.observe(el);
+    });
+</script>
+</body>
+</html>
