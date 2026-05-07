@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>stocks — inky</title>
+    <link rel="stylesheet" href="style.css?v=2"/>
+    <link rel="icon" type="image/x-icon" href="images/cat4.png">
+</head>
+<script src="script.js"></script>
+<body>
+<div id="page">
+
+    <div id="header">
+        <div id="header-banner"></div>
+        <div id="header-text">
+            <div id="site-title"><a href="index.html">inky</a></div>
+            <div id="site-tagline">somewhere on the internet</div>
+        </div>
+    </div>
+
+    <div id="columns">
+    <div id="main">
+
+        <div class="st-header">
+            <h2 class="st-title">critical minerals</h2>
+            <div class="st-date" id="st-date">loading...</div>
+        </div>
+
+        <div class="st-cats" id="st-cats"></div>
+
+        <div class="st-table-wrap">
+            <div id="st-table"><div class="st-loading">fetching prices...</div></div>
+        </div>
+
+        <div class="st-footnote" id="st-footnote" style="display:none">
+            mkt cap = est. (close × hardcoded shares outstanding) &nbsp;·&nbsp; chg = vs prev trading day close &nbsp;·&nbsp; click any row to add notes
+        </div>
+
+    </div>
+
+    <div id="sidebar">
+        <div class="widget">
+            <div class="widget-title">nav</div>
+            <div class="widget-body">
+                <a href="blog.html">blog</a><br>
+                <a href="projects.html">projects</a><br>
+                <a href="experiences.html">experiences</a><br>
+                <a href="menu.html">menu</a>
+            </div>
+        </div>
+        <div class="widget">
+            <div class="widget-title">currently</div>
+            <div class="widget-body">
+                mood: <span class="val">tired</span><br>
+                avoiding: <span class="val">work</span><br>
+                watching: <span class="val" id="sidebar-watching">—</span>
+            </div>
+        </div>
+        <div class="widget">
+            <div class="widget-title">site</div>
+            <div class="widget-body">
+                est. <span class="val">2024</span><br>
+                updated: <span class="val">may '26</span>
+            </div>
+        </div>
+        <div class="widget">
+            <div class="widget-title">elsewhere</div>
+            <div class="widget-body">
+                <a href="https://github.com/Inkiad" target="_blank">github</a>
+            </div>
+        </div>
+        <div class="widget">
+            <div class="widget-title">about</div>
+            <div class="widget-body">
+                32 critical minerals<br>
+                stocks tracked.<br>
+                <span class="val">end-of-day prices.</span>
+            </div>
+        </div>
+    </div>
+    </div>
+
+</div>
+
+<!-- Notes side panel -->
+<div id="st-overlay" class="st-overlay"></div>
+<div id="st-panel" class="st-panel">
+    <div class="st-panel-header">
+        <div>
+            <span class="st-panel-ticker" id="st-panel-ticker"></span>
+            <span class="st-panel-name" id="st-panel-name"></span>
+        </div>
+        <button class="st-panel-close" id="st-panel-close" aria-label="close">×</button>
+    </div>
+    <div class="st-panel-notes" id="st-panel-notes">
+        <div class="st-notes-empty">select a ticker to view notes.</div>
+    </div>
+    <div class="st-panel-form">
+        <textarea class="st-note-input" id="st-note-input" placeholder="add a note..." rows="3"></textarea>
+        <div class="st-form-row">
+            <input type="password" class="st-pw-input" id="st-pw-input" placeholder="password">
+            <button class="st-submit-btn" id="st-submit-btn">add</button>
+        </div>
+        <div class="st-form-msg" id="st-form-msg"></div>
+    </div>
+</div>
+
+<div id="cat"></div>
+<div id="cat-bubble"></div>
+
+<script>
+const WORKER_URL = 'https://stocks-proxy.inkiad-j-ahmed.workers.dev';
+
+const CATEGORIES = ['All', 'Rare Earth', 'Copper', 'Lithium', 'Uranium', 'Nickel', 'PGM', 'Other'];
+const CAT_ORDER  = ['Rare Earth', 'Copper', 'Lithium', 'Uranium', 'Nickel', 'PGM', 'Other'];
+
+let allStocks = [];
+let activeCategory = 'All';
+let activeTicker = null;
+
+// ── Formatting helpers ────────────────────────────────────────────────────────
+
+function fmtPrice(v) {
+    if (v == null) return '—';
+    return '$' + v.toFixed(2);
+}
+
+function fmtChange(v) {
+    if (v == null) return '—';
+    const sign = v > 0 ? '+' : '';
+    return sign + v.toFixed(2) + '%';
+}
+
+function fmtMcap(v) {
+    if (v == null) return '—';
+    if (v >= 1e9) return '$' + (v / 1e9).toFixed(1) + 'B';
+    if (v >= 1e6) return '$' + Math.round(v / 1e6) + 'M';
+    return '$' + v.toLocaleString();
+}
+
+function fmtDate(iso) {
+    const [y, m, d] = iso.split('-').map(Number);
+    return new Date(y, m - 1, d).toLocaleDateString('en-US', {
+        month: 'long', day: 'numeric', year: 'numeric'
+    });
+}
+
+function escHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+// ── Category pills ────────────────────────────────────────────────────────────
+
+function buildCats() {
+    const container = document.getElementById('st-cats');
+    CATEGORIES.forEach(cat => {
+        const pill = document.createElement('span');
+        pill.className = 'st-cat-pill' + (cat === activeCategory ? ' active' : '');
+        pill.textContent = cat;
+        pill.addEventListener('click', () => {
+            if (activeCategory === cat) return;
+            activeCategory = cat;
+            document.querySelectorAll('.st-cat-pill').forEach(p =>
+                p.classList.toggle('active', p.textContent === cat));
+            renderTable();
+        });
+        container.appendChild(pill);
+    });
+}
+
+// ── Table rendering ───────────────────────────────────────────────────────────
+
+function renderTable() {
+    const wrap = document.getElementById('st-table');
+    const stocks = activeCategory === 'All'
+        ? allStocks
+        : allStocks.filter(s => s.category === activeCategory);
+
+    if (stocks.length === 0) {
+        wrap.innerHTML = '<div class="st-loading">no data.</div>';
+        return;
+    }
+
+    const groups = {};
+    stocks.forEach(s => {
+        if (!groups[s.category]) groups[s.category] = [];
+        groups[s.category].push(s);
+    });
+
+    const tbl = document.createElement('table');
+    tbl.className = 'st-tbl';
+
+    const thead = document.createElement('thead');
+    thead.innerHTML =
+        '<tr>' +
+        '<th>Ticker</th>' +
+        '<th>Name</th>' +
+        '<th class="r">Close</th>' +
+        '<th class="r">Chg</th>' +
+        '<th class="r">Mkt Cap</th>' +
+        '<th></th>' +
+        '</tr>';
+    tbl.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+    const orderedCats = CAT_ORDER.filter(c => groups[c]);
+
+    orderedCats.forEach(cat => {
+        const groupRow = document.createElement('tr');
+        groupRow.className = 'st-group-row';
+        groupRow.innerHTML = '<td colspan="6">' + escHtml(cat) + '</td>';
+        tbody.appendChild(groupRow);
+
+        groups[cat].forEach(stock => {
+            const row = document.createElement('tr');
+            row.className = 'st-row';
+
+            const chgClass = stock.change_pct == null ? 'flat'
+                : stock.change_pct > 0.005 ? 'up'
+                : stock.change_pct < -0.005 ? 'dn'
+                : 'flat';
+
+            row.innerHTML =
+                '<td class="st-tick">' + escHtml(stock.ticker) + '</td>' +
+                '<td class="st-name-cell">' + escHtml(stock.name) + '</td>' +
+                '<td class="st-price">' + fmtPrice(stock.close) + '</td>' +
+                '<td class="st-chg ' + chgClass + '">' + fmtChange(stock.change_pct) + '</td>' +
+                '<td class="st-mcap">' + fmtMcap(stock.market_cap) + '</td>' +
+                '<td class="st-arr">›</td>';
+
+            row.addEventListener('click', () => openPanel(stock.ticker, stock.name));
+            tbody.appendChild(row);
+        });
+    });
+
+    tbl.appendChild(tbody);
+    wrap.innerHTML = '';
+    wrap.appendChild(tbl);
+}
+
+// ── Notes panel ───────────────────────────────────────────────────────────────
+
+function openPanel(ticker, name) {
+    activeTicker = ticker;
+    document.getElementById('st-panel-ticker').textContent = ticker;
+    document.getElementById('st-panel-name').textContent = name;
+    document.getElementById('st-panel-notes').innerHTML = '<div class="st-notes-empty">loading...</div>';
+    document.getElementById('st-form-msg').textContent = '';
+    document.getElementById('st-form-msg').className = 'st-form-msg';
+    document.getElementById('st-note-input').value = '';
+
+    document.getElementById('st-panel').classList.add('open');
+    document.getElementById('st-overlay').classList.add('open');
+
+    fetch(WORKER_URL + '/notes/' + ticker)
+        .then(r => r.json())
+        .then(data => renderNotes(data.notes || []))
+        .catch(() => {
+            document.getElementById('st-panel-notes').innerHTML =
+                '<div class="st-notes-empty">failed to load notes.</div>';
+        });
+}
+
+function closePanel() {
+    activeTicker = null;
+    document.getElementById('st-panel').classList.remove('open');
+    document.getElementById('st-overlay').classList.remove('open');
+}
+
+function renderNotes(notes) {
+    const container = document.getElementById('st-panel-notes');
+    if (!notes.length) {
+        container.innerHTML = '<div class="st-notes-empty">no notes yet.</div>';
+        return;
+    }
+    container.innerHTML = '';
+    [...notes].reverse().forEach(note => {
+        const div = document.createElement('div');
+        div.className = 'st-note-entry';
+        div.innerHTML =
+            '<div class="st-note-date">' + escHtml(note.date) + '</div>' +
+            '<div class="st-note-text">' + escHtml(note.text) + '</div>';
+        container.appendChild(div);
+    });
+}
+
+async function submitNote() {
+    const ticker = activeTicker;
+    if (!ticker) return;
+
+    const text = document.getElementById('st-note-input').value.trim();
+    const password = document.getElementById('st-pw-input').value;
+    const msg = document.getElementById('st-form-msg');
+    const btn = document.getElementById('st-submit-btn');
+
+    if (!text) {
+        msg.textContent = 'note is empty.';
+        msg.className = 'st-form-msg err';
+        return;
+    }
+
+    btn.disabled = true;
+    msg.textContent = 'saving...';
+    msg.className = 'st-form-msg';
+
+    try {
+        const resp = await fetch(WORKER_URL + '/notes/' + ticker, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text, password }),
+        });
+        const data = await resp.json();
+        if (resp.ok) {
+            document.getElementById('st-note-input').value = '';
+            msg.textContent = 'saved.';
+            msg.className = 'st-form-msg ok';
+            fetch(WORKER_URL + '/notes/' + ticker)
+                .then(r => r.json())
+                .then(d => renderNotes(d.notes || []));
+        } else {
+            msg.textContent = data.error || 'error.';
+            msg.className = 'st-form-msg err';
+        }
+    } catch {
+        msg.textContent = 'network error.';
+        msg.className = 'st-form-msg err';
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+
+document.getElementById('st-panel-close').addEventListener('click', closePanel);
+document.getElementById('st-overlay').addEventListener('click', closePanel);
+document.getElementById('st-submit-btn').addEventListener('click', submitNote);
+
+document.getElementById('st-note-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) submitNote();
+});
+
+buildCats();
+
+fetch(WORKER_URL + '/prices')
+    .then(r => r.json())
+    .then(data => {
+        allStocks = data.stocks || [];
+        if (data.date) {
+            document.getElementById('st-date').textContent =
+                'as of market close — ' + fmtDate(data.date);
+        }
+        document.getElementById('st-footnote').style.display = '';
+        renderTable();
+    })
+    .catch(() => {
+        document.getElementById('st-table').innerHTML =
+            '<div class="st-loading">failed to load prices. check worker logs.</div>';
+        document.getElementById('st-date').textContent = '';
+    });
+</script>
+
+</body>
+</html>
