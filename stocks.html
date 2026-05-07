@@ -118,6 +118,8 @@ const CAT_ORDER  = ['Rare Earth', 'Copper', 'Lithium', 'Uranium', 'Nickel', 'PGM
 let allStocks = [];
 let activeCategory = 'All';
 let activeTicker = null;
+let sortCol = null;   // null | 'change_pct' | 'market_cap'
+let sortDir = 'desc';
 
 // ── Formatting helpers ────────────────────────────────────────────────────────
 
@@ -196,19 +198,53 @@ function renderTable() {
     tbl.className = 'st-tbl';
 
     const thead = document.createElement('thead');
-    thead.innerHTML =
-        '<tr>' +
-        '<th>Ticker</th>' +
-        '<th>Name</th>' +
-        '<th class="r">Close</th>' +
-        '<th class="r">Chg</th>' +
-        '<th class="r">Mkt Cap</th>' +
-        '<th></th>' +
-        '</tr>';
+    const tr = document.createElement('tr');
+
+    function makeHeader(label, col, align) {
+        const th = document.createElement('th');
+        if (align === 'r') th.className = 'r';
+        if (col) {
+            const indicator = sortCol === col ? (sortDir === 'desc' ? ' ▼' : ' ▲') : '';
+            th.textContent = label + indicator;
+            th.classList.add('st-th-sort');
+            th.addEventListener('click', () => {
+                if (sortCol === col) {
+                    if (sortDir === 'desc') sortDir = 'asc';
+                    else { sortCol = null; }
+                } else {
+                    sortCol = col;
+                    sortDir = 'desc';
+                }
+                renderTable();
+            });
+        } else {
+            th.textContent = label;
+        }
+        return th;
+    }
+
+    tr.appendChild(makeHeader('Ticker', null, ''));
+    tr.appendChild(makeHeader('Name', null, ''));
+    tr.appendChild(makeHeader('Close', null, 'r'));
+    tr.appendChild(makeHeader('Chg', 'change_pct', 'r'));
+    tr.appendChild(makeHeader('Mkt Cap', 'market_cap', 'r'));
+    tr.appendChild(makeHeader('', null, ''));
+    thead.appendChild(tr);
     tbl.appendChild(thead);
 
     const tbody = document.createElement('tbody');
     const orderedCats = CAT_ORDER.filter(c => groups[c]);
+
+    if (sortCol) {
+        const nullVal = sortDir === 'desc' ? -Infinity : Infinity;
+        orderedCats.forEach(cat => {
+            groups[cat].sort((a, b) => {
+                const av = a[sortCol] ?? nullVal;
+                const bv = b[sortCol] ?? nullVal;
+                return sortDir === 'desc' ? bv - av : av - bv;
+            });
+        });
+    }
 
     orderedCats.forEach(cat => {
         const groupRow = document.createElement('tr');

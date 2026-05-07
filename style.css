@@ -601,6 +601,8 @@ body {
 }
 
 .st-tbl th.r { text-align: right; }
+.st-th-sort { cursor: pointer; user-select: none; }
+.st-th-sort:hover { color: #808078; }
 
 .st-group-row td {
     padding-top: 20px;
