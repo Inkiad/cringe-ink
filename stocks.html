@@ -380,6 +380,10 @@ document.getElementById('st-note-input').addEventListener('keydown', e => {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) submitNote();
 });
 
+document.getElementById('st-pw-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') submitNote();
+});
+
 buildCats();
 
 fetch(WORKER_URL + '/prices')
