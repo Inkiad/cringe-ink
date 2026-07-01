@@ -329,7 +329,7 @@ var _yr = D.yrList[D.yrList.length - 1];
 
 function initYearly() {
     document.getElementById('yr-pills').innerHTML = D.yrList.map(function(y) {
-        return '<button class="sp-nb' + (y === _yr ? ' on' : '') + '" onclick="showYr('' + y + '',this)">' + y + '</button>';
+        return `<button class="sp-nb${y === _yr ? ' on' : ''}" onclick="showYr('${y}',this)">${y}</button>`;
     }).join('');
     renderYr(_yr);
 }
@@ -435,7 +435,7 @@ var _dyr = D.yrList[D.yrList.length - 1];
 
 function initDevices() {
     document.getElementById('dev-pills').innerHTML = D.yrList.map(function(y) {
-        return '<button class="sp-nb' + (y === _dyr ? ' on' : '') + '" onclick="showDev('' + y + '',this)">' + y + '</button>';
+        return `<button class="sp-nb${y === _dyr ? ' on' : ''}" onclick="showDev('${y}',this)">${y}</button>`;
     }).join('');
     renderDev(_dyr);
 }
