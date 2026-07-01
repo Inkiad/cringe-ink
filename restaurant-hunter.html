@@ -65,8 +65,7 @@
                 <a href="blog.html">blog</a><br>
                 <a href="projects.html">projects</a><br>
                 <a href="experiences.html">experiences</a><br>
-                <a href="menu.html">menu</a><br>
-                <a href="politics.html">politics</a>
+                <a href="menu.html">menu</a>
             </div>
         </div>
         <div class="widget">
@@ -409,7 +408,7 @@ document.getElementById("rh-filter-toggle").addEventListener("click", () => {
 
 // ── Load data ─────────────────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
-    fetch("data/restaurants-all.json")
+    fetch("data/restaurants-kept.json")
         .then(r => r.json())
         .then(data => init(data))
         .catch(err => {
